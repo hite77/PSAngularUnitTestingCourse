@@ -17,7 +17,8 @@ export class HeroDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private heroService: HeroService,
     private location: Location
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.getHero();
@@ -33,8 +34,33 @@ export class HeroDetailComponent implements OnInit {
     this.location.back();
   }
 
- save(): void {
-    this.heroService.updateHero(this.hero)
-      .subscribe(() => this.goBack());
+  save(): void {
+    const p = new Promise((resolve) => {
+      this.heroService.updateHero(this.hero)
+        .subscribe(() => this.goBack());
+      resolve();
+    });
   }
+
+  // save(): void {
+  //   debounce(() => {
+  //     this.heroService.updateHero(this.hero)
+  //       .subscribe(() => this.goBack());
+  //   }, 250, false)();
+  // }
+}
+
+function debounce(func, wait, immediate) {
+  let timeout;
+  return function() {
+    let context = this, args = arguments;
+    let later = function() {
+      timeout = null;
+      if (!immediate) { func.apply(context, args); }
+    };
+    let callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) { func.apply(context, args); }
+  };
 }
